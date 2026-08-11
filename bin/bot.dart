@@ -5,6 +5,7 @@ import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
 import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
+import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
@@ -15,6 +16,7 @@ import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
+import 'package:fluxer_dart_bot/commands/sticker_command.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
@@ -113,6 +115,16 @@ Future<void> main() async {
         'auditlog',
         handleAuditLog,
         middleware: [requireGuildPermission(PermissionFlag.viewAuditLog)],
+      )
+      ..command(
+        'emoji',
+        handleEmoji,
+        middleware: [requireGuildPermission(PermissionFlag.createExpressions)],
+      )
+      ..command(
+        'sticker',
+        handleSticker,
+        middleware: [requireGuildPermission(PermissionFlag.createExpressions)],
       );
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
