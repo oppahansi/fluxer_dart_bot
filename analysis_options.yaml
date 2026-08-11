@@ -1,0 +1,8 @@
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - always_declare_return_types
+    # avoid_print is deliberately omitted here (unlike the library
+    # packages): this is a CLI app whose entire job is console output.
