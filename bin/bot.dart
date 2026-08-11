@@ -1,16 +1,21 @@
 import 'dart:io';
 
 import 'package:fluxer_dart/fluxer_dart.dart';
+import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
+import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
+import 'package:fluxer_dart_bot/commands/kick_command.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
 import 'package:fluxer_dart_bot/commands/purge_command.dart';
 import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
+import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
+import 'package:fluxer_dart_bot/commands/timeout_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
 Future<void> main() async {
@@ -59,10 +64,56 @@ Future<void> main() async {
       ..command('embed', handleEmbed)
       ..command('reply', handleReply)
       ..command('react', handleReact)
-      ..command('purge', handlePurge)
-      ..command('channel', handleChannel)
-      ..command('slowmode', handleSlowmode)
-      ..command('permission', handlePermission);
+      ..command(
+        'purge',
+        handlePurge,
+        middleware: [requireGuildPermission(PermissionFlag.manageMessages)],
+      )
+      ..command(
+        'channel',
+        handleChannel,
+        middleware: [requireGuildPermission(PermissionFlag.manageChannels)],
+      )
+      ..command(
+        'slowmode',
+        handleSlowmode,
+        middleware: [requireGuildPermission(PermissionFlag.manageChannels)],
+      )
+      ..command(
+        'permission',
+        handlePermission,
+        middleware: [requireGuildPermission(PermissionFlag.manageRoles)],
+      )
+      ..command(
+        'kick',
+        handleKick,
+        middleware: [requireGuildPermission(PermissionFlag.kickMembers)],
+      )
+      ..command(
+        'ban',
+        handleBan,
+        middleware: [requireGuildPermission(PermissionFlag.banMembers)],
+      )
+      ..command(
+        'unban',
+        handleUnban,
+        middleware: [requireGuildPermission(PermissionFlag.banMembers)],
+      )
+      ..command(
+        'timeout',
+        handleTimeout,
+        middleware: [requireGuildPermission(PermissionFlag.moderateMembers)],
+      )
+      ..command(
+        'role',
+        handleRole,
+        middleware: [requireGuildPermission(PermissionFlag.manageRoles)],
+      )
+      ..command(
+        'auditlog',
+        handleAuditLog,
+        middleware: [requireGuildPermission(PermissionFlag.viewAuditLog)],
+      );
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
     // already logged at INFO by fluxer_dart_gateway itself via the same

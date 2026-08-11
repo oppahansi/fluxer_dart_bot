@@ -1,10 +1,9 @@
 import 'package:fluxer_dart/fluxer_dart.dart';
 
 /// Bulk-deletes the last `!purge <count>` messages in the channel
-/// (1-100). The first genuinely destructive example command — no
-/// permission gate yet, since `requireGuildPermission` middleware
-/// doesn't exist until a later milestone; add `manageMessages` gating to
-/// this command's registration once it does.
+/// (1-100). Registered with `requireGuildPermission(manageMessages)` in
+/// `bin/bot.dart` — the first genuinely destructive example command, and
+/// the reason that middleware exists at all.
 ///
 /// Catches [FluxerApiException] itself rather than letting it propagate
 /// to `runGuarded`'s catch-all: confirmed live that a bot without

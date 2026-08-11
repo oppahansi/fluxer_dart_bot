@@ -80,15 +80,3 @@ Future<void> handleChannel(CommandContext context) async {
       );
   }
 }
-
-extension on Channel {
-  /// `null` for channel kinds with no guild (DMs) — every guild-scoped
-  /// variant carries its own `guildId`, but `Channel` itself doesn't
-  /// unify that into a shared getter since not every subtype has one.
-  Snowflake? get guildId => switch (this) {
-    GuildTextChannel(:final guildId) => guildId,
-    GuildVoiceChannel(:final guildId) => guildId,
-    GuildCategoryChannel(:final guildId) => guildId,
-    _ => null,
-  };
-}
