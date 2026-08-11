@@ -24,13 +24,12 @@ dispatch, WARNING/ERROR for reconnects and fatal closes) show up at all —
 the default is a silent `NoopLogger`.
 
 `main()`'s whole body runs inside `runGuarded(...)` (from `fluxer_utils`),
-which is `dart:async`'s `runZonedGuarded` under the hood — the actual Dart
-mechanism for "catch any otherwise-uncaught async error and don't crash
-the process," including exceptions thrown inside the plain
+which wraps `dart:async`'s `runZonedGuarded` — it catches any otherwise-
+uncaught asynchronous error and routes it through the logger instead of
+crashing the process, including exceptions thrown inside the plain
 `bot.onXyz.listen(...)` callbacks below. Event handlers don't need a
-special method to be safe; the Zone established once at the top protects
-everything that runs within it, the standard Dart idiom for this (the same
-shape as `runZonedGuarded(() => runApp(MyApp()), ...)` in Flutter).
+special method to be safe; the `Zone` established once at the top
+protects everything that runs within it.
 
 ## Setup
 
