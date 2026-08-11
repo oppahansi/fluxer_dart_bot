@@ -9,12 +9,12 @@ bot with the framework, not to be a feature-complete bot.
 - Logs in — connection lifecycle (`Connecting`/`Identifying`/`Connected`/
   `READY`/...) is printed automatically by `fluxer_gateway` itself once you
   give `Bot` a real `Logger`, not something this example prints manually.
-- Logs every guild it can see (`lib/commands/guild_create_logger.dart`).
-- Replies `pong` to a `!ping` message (`lib/commands/ping_command.dart`).
-
-Each "command" is just a plain function in its own file under
-`lib/commands/` — fluxer.dart doesn't have a formal command router yet, so
-this is the pattern to follow until one lands.
+- Logs every guild it can see (`lib/commands/guild_create_logger.dart`) —
+  a plain `bot.onGuildCreate.listen(...)` handler, not a command.
+- Replies `pong` to `!ping`, rate-limited to once per 5 seconds per user
+  (`lib/commands/ping_command.dart`), registered on a `CommandRouter` in
+  `bin/bot.dart` — demonstrates fluent command registration and
+  middleware (`cooldown(...)`).
 
 ### Logging and handler safety
 

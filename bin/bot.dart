@@ -38,7 +38,13 @@ Future<void> main() async {
     // Ordinary Stream.listen — no special method needed for safety, that's
     // what the runGuarded wrapper above is for.
     bot.onGuildCreate.listen((event) => handleGuildCreate(event, logger));
-    bot.onMessageCreate.listen((event) => handlePingCommand(bot, event));
+
+    final commands = CommandRouter(bot: bot, prefix: '!')
+      ..command(
+        'ping',
+        handlePing,
+        middleware: [cooldown(Duration(seconds: 5))],
+      );
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
     // already logged at INFO by fluxer_gateway itself via the same
@@ -49,6 +55,7 @@ Future<void> main() async {
     // not the connection's lifetime.
     await ProcessSignal.sigint.watch().first;
     logger.info('Shutting down...');
+    await commands.dispose();
     await bot.dispose();
   }, logger: logger);
 }
