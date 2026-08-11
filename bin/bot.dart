@@ -1,8 +1,13 @@
 import 'dart:io';
 
 import 'package:fluxer_dart/fluxer_dart.dart';
+import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
+import 'package:fluxer_dart_bot/commands/purge_command.dart';
+import 'package:fluxer_dart_bot/commands/react_command.dart';
+import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
+import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
 Future<void> main() async {
@@ -38,13 +43,20 @@ Future<void> main() async {
     // Ordinary Stream.listen — no special method needed for safety, that's
     // what the runGuarded wrapper above is for.
     bot.onGuildCreate.listen((event) => handleGuildCreate(event, logger));
+    bot.onMessageReactionAdd.listen(
+      (event) => handleMessageReactionAdd(event, logger),
+    );
 
     final commands = CommandRouter(bot: bot, prefix: '!')
       ..command(
         'ping',
         handlePing,
         middleware: [cooldown(Duration(seconds: 5))],
-      );
+      )
+      ..command('embed', handleEmbed)
+      ..command('reply', handleReply)
+      ..command('react', handleReact)
+      ..command('purge', handlePurge);
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
     // already logged at INFO by fluxer_dart_gateway itself via the same
