@@ -18,6 +18,7 @@ import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
 import 'package:fluxer_dart_bot/commands/sticker_command.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
+import 'package:fluxer_dart_bot/commands/webhook_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
 Future<void> main() async {
@@ -125,6 +126,11 @@ Future<void> main() async {
         'sticker',
         handleSticker,
         middleware: [requireGuildPermission(PermissionFlag.createExpressions)],
+      )
+      ..command(
+        'webhook',
+        handleWebhook,
+        middleware: [requireGuildPermission(PermissionFlag.manageWebhooks)],
       );
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
