@@ -23,12 +23,14 @@ gateway's own lifecycle logging (INFO for connect/resume, DEBUG for every
 dispatch, WARNING/ERROR for reconnects and fatal closes) show up at all —
 the default is a silent `NoopLogger`.
 
-Event handlers are attached with `.listenSafely(...)` (from `fluxer_utils`),
-not the raw `Stream.listen(...)`. Dart can't make this automatic the way
-discord.py's dispatch loop protects `@bot.event` handlers — there's no way
-for a `Stream` to intercept what happens inside a caller's own `.listen()`
-callback — so `.listenSafely()` is the explicit opt-in: a bug in one
-handler gets logged instead of taking the whole bot down.
+`main()`'s whole body runs inside `runGuarded(...)` (from `fluxer_utils`),
+which is `dart:async`'s `runZonedGuarded` under the hood — the actual Dart
+mechanism for "catch any otherwise-uncaught async error and don't crash
+the process," including exceptions thrown inside the plain
+`bot.onXyz.listen(...)` callbacks below. Event handlers don't need a
+special method to be safe; the Zone established once at the top protects
+everything that runs within it, the standard Dart idiom for this (the same
+shape as `runZonedGuarded(() => runApp(MyApp()), ...)` in Flutter).
 
 ## Setup
 

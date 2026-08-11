@@ -18,40 +18,37 @@ Future<void> main() async {
 
   final restBaseUrlString = env['FLUXER_REST_BASE_URL'];
   final logger = const PrintLogger(minLevel: LogLevel.info);
-  final bot = Bot(
-    token: token,
-    logger: logger,
-    restBaseUrl: restBaseUrlString == null
-        ? null
-        : Uri.parse(restBaseUrlString),
-  );
 
-  // Not `.listen(...)`: an exception thrown inside a handler — a bug in
-  // your own command code, most commonly — would otherwise be an
-  // unhandled error that can bring the whole process down. Dart can't
-  // make this automatic the way discord.py's dispatch loop does (there's
-  // no way for a Stream to intercept what happens inside a caller's own
-  // .listen() callback), so `.listenSafely()` is the opt-in fix: it logs
-  // via the same Logger instead, and keeps the bot running.
-  bot.onGuildCreate.listenSafely(
-    (event) => handleGuildCreate(event, logger),
-    logger: logger,
-    context: 'onGuildCreate',
-  );
-  bot.onMessageCreate.listenSafely(
-    (event) => handlePingCommand(bot, event),
-    logger: logger,
-    context: 'onMessageCreate',
-  );
+  // runGuarded wraps everything below in a Zone that routes uncaught
+  // errors — including exceptions inside the plain .listen() callbacks
+  // below, a bug in your own command code being the usual case — through
+  // `logger` instead of crashing the process. This has to wrap the whole
+  // program from here down, not just bot.login(): the Zone only protects
+  // code that runs causally within it, and .listen() binds its callback
+  // to whatever Zone was active when .listen() itself was called.
+  await runGuarded(() async {
+    final bot = Bot(
+      token: token,
+      logger: logger,
+      restBaseUrl: restBaseUrlString == null
+          ? null
+          : Uri.parse(restBaseUrlString),
+    );
 
-  // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
-  // already logged at INFO by fluxer_gateway itself via the same `logger`
-  // — nothing to print here for that.
-  await bot.login();
+    // Ordinary Stream.listen — no special method needed for safety, that's
+    // what the runGuarded wrapper above is for.
+    bot.onGuildCreate.listen((event) => handleGuildCreate(event, logger));
+    bot.onMessageCreate.listen((event) => handlePingCommand(bot, event));
 
-  // Keep the process alive; login() only awaits the initial connect(),
-  // not the connection's lifetime.
-  await ProcessSignal.sigint.watch().first;
-  logger.info('Shutting down...');
-  await bot.dispose();
+    // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
+    // already logged at INFO by fluxer_gateway itself via the same
+    // `logger` — nothing to print here for that.
+    await bot.login();
+
+    // Keep the process alive; login() only awaits the initial connect(),
+    // not the connection's lifetime.
+    await ProcessSignal.sigint.watch().first;
+    logger.info('Shutting down...');
+    await bot.dispose();
+  }, logger: logger);
 }
