@@ -1,6 +1,6 @@
 name: fluxer_dart_bot
 description: >-
-  Example bot for the fluxer.dart framework — deliberately modest, meant to
+  Example bot for the fluxer_dart framework — deliberately modest, meant to
   be read as a reference for how to build a bot with it, not a
   feature-complete bot.
 version: 0.1.0
@@ -10,8 +10,8 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
-  fluxer:
-    path: ../fluxer.dart
+  fluxer_dart:
+    path: ../fluxer_dart
 
 dev_dependencies:
   lints: ^6.1.0

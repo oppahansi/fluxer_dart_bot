@@ -1,13 +1,13 @@
-# fluxer.dart-bot
+# fluxer_dart_bot
 
-An example bot for [fluxer.dart](https://github.com/oppahansi/fluxer.dart) —
+An example bot for [fluxer_dart](https://github.com/oppahansi/fluxer_dart) —
 deliberately modest. It exists to be read as a reference for how to build a
 bot with the framework, not to be a feature-complete bot.
 
 ## What it does
 
 - Logs in — connection lifecycle (`Connecting`/`Identifying`/`Connected`/
-  `READY`/...) is printed automatically by `fluxer_gateway` itself once you
+  `READY`/...) is printed automatically by `fluxer_dart_gateway` itself once you
   give `Bot` a real `Logger`, not something this example prints manually.
 - Logs every guild it can see (`lib/commands/guild_create_logger.dart`) —
   a plain `bot.onGuildCreate.listen(...)` handler, not a command.
@@ -23,7 +23,7 @@ gateway's own lifecycle logging (INFO for connect/resume, DEBUG for every
 dispatch, WARNING/ERROR for reconnects and fatal closes) show up at all —
 the default is a silent `NoopLogger`.
 
-`main()`'s whole body runs inside `runGuarded(...)` (from `fluxer_utils`),
+`main()`'s whole body runs inside `runGuarded(...)` (from `fluxer_dart_utils`),
 which wraps `dart:async`'s `runZonedGuarded` — it catches any otherwise-
 uncaught asynchronous error and routes it through the logger instead of
 crashing the process, including exceptions thrown inside the plain
@@ -49,16 +49,17 @@ protects everything that runs within it.
    dart run bin/bot.dart
    ```
 
-## Part of the fluxer.dart ecosystem
+## Part of the fluxer_dart ecosystem
 
 | Package | Purpose |
 |---|---|
-| [`fluxer_utils`](https://github.com/oppahansi/fluxer_utils) | generic building blocks |
-| [`fluxer_core`](https://github.com/oppahansi/fluxer_core) | domain models |
-| [`fluxer_rest`](https://github.com/oppahansi/fluxer_rest) | REST client |
-| [`fluxer_gateway`](https://github.com/oppahansi/fluxer_gateway) | WebSocket gateway client |
-| [`fluxer.dart`](https://github.com/oppahansi/fluxer.dart) | main framework — the `Bot` facade |
-| [`fluxer.dart-bot`](https://github.com/oppahansi/fluxer.dart-bot) | *(this repo)* example bot |
+| [`fluxer_dart_utils`](https://github.com/oppahansi/fluxer_dart_utils) | generic building blocks |
+| [`fluxer_dart_core`](https://github.com/oppahansi/fluxer_dart_core) | domain models |
+| [`fluxer_dart_rest`](https://github.com/oppahansi/fluxer_dart_rest) | REST client |
+| [`fluxer_dart_gateway`](https://github.com/oppahansi/fluxer_dart_gateway) | WebSocket gateway client |
+| [`fluxer_dart_voice`](https://github.com/oppahansi/fluxer_dart_voice) | voice support |
+| [`fluxer_dart`](https://github.com/oppahansi/fluxer_dart) | main framework — the `Bot` facade |
+| [`fluxer_dart_bot`](https://github.com/oppahansi/fluxer_dart_bot) | *(this repo)* example bot |
 
 ## License
 

@@ -1,4 +1,4 @@
-import 'package:fluxer/fluxer.dart';
+import 'package:fluxer_dart/fluxer_dart.dart';
 
 /// Logs every guild the bot can see, once per `GUILD_CREATE` dispatch
 /// (sent for each guild on connect, and again if the bot joins a new one

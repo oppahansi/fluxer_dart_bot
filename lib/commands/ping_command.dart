@@ -1,4 +1,4 @@
-import 'package:fluxer/fluxer.dart';
+import 'package:fluxer_dart/fluxer_dart.dart';
 
 /// Replies "pong" to `!ping`, rate-limited to once per 5 seconds per user
 /// via [cooldown] — demonstrates `CommandRouter` middleware.

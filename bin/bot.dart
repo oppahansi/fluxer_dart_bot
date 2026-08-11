@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:fluxer/fluxer.dart';
+import 'package:fluxer_dart/fluxer_dart.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
@@ -47,7 +47,7 @@ Future<void> main() async {
       );
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
-    // already logged at INFO by fluxer_gateway itself via the same
+    // already logged at INFO by fluxer_dart_gateway itself via the same
     // `logger` — nothing to print here for that.
     await bot.login();
 

@@ -1,4 +1,4 @@
-import 'package:fluxer/fluxer.dart';
+import 'package:fluxer_dart/fluxer_dart.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:test/test.dart';
 
