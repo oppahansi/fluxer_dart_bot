@@ -17,30 +17,41 @@ Future<void> main() async {
   }
 
   final restBaseUrlString = env['FLUXER_REST_BASE_URL'];
+  final logger = const PrintLogger(minLevel: LogLevel.info);
   final bot = Bot(
     token: token,
-    logger: const PrintLogger(minLevel: LogLevel.info),
+    logger: logger,
     restBaseUrl: restBaseUrlString == null
         ? null
         : Uri.parse(restBaseUrlString),
   );
 
-  bot.connectionStateChanges.listen((state) => print('[state] $state'));
-  bot.onReady.listen((event) {
-    print(
-      'Ready — logged in as ${event.user.username} (session ${event.sessionId})',
-    );
-  });
-  bot.onGuildCreate.listen(handleGuildCreate);
-  bot.onMessageCreate.listen((event) => handlePingCommand(bot, event));
+  // Not `.listen(...)`: an exception thrown inside a handler — a bug in
+  // your own command code, most commonly — would otherwise be an
+  // unhandled error that can bring the whole process down. Dart can't
+  // make this automatic the way discord.py's dispatch loop does (there's
+  // no way for a Stream to intercept what happens inside a caller's own
+  // .listen() callback), so `.listenSafely()` is the opt-in fix: it logs
+  // via the same Logger instead, and keeps the bot running.
+  bot.onGuildCreate.listenSafely(
+    (event) => handleGuildCreate(event, logger),
+    logger: logger,
+    context: 'onGuildCreate',
+  );
+  bot.onMessageCreate.listenSafely(
+    (event) => handlePingCommand(bot, event),
+    logger: logger,
+    context: 'onMessageCreate',
+  );
 
-  print('Logging in...');
+  // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
+  // already logged at INFO by fluxer_gateway itself via the same `logger`
+  // — nothing to print here for that.
   await bot.login();
-  print('login() returned, connection state: ${bot.connectionState}');
 
   // Keep the process alive; login() only awaits the initial connect(),
   // not the connection's lifetime.
   await ProcessSignal.sigint.watch().first;
-  print('Shutting down...');
+  logger.info('Shutting down...');
   await bot.dispose();
 }

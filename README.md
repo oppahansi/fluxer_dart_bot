@@ -6,13 +6,29 @@ bot with the framework, not to be a feature-complete bot.
 
 ## What it does
 
-- Logs in and prints a line when `READY` comes through.
+- Logs in — connection lifecycle (`Connecting`/`Identifying`/`Connected`/
+  `READY`/...) is printed automatically by `fluxer_gateway` itself once you
+  give `Bot` a real `Logger`, not something this example prints manually.
 - Logs every guild it can see (`lib/commands/guild_create_logger.dart`).
 - Replies `pong` to a `!ping` message (`lib/commands/ping_command.dart`).
 
 Each "command" is just a plain function in its own file under
 `lib/commands/` — fluxer.dart doesn't have a formal command router yet, so
 this is the pattern to follow until one lands.
+
+### Logging and handler safety
+
+`bin/bot.dart` passes a `PrintLogger` into `Bot`, which is what makes the
+gateway's own lifecycle logging (INFO for connect/resume, DEBUG for every
+dispatch, WARNING/ERROR for reconnects and fatal closes) show up at all —
+the default is a silent `NoopLogger`.
+
+Event handlers are attached with `.listenSafely(...)` (from `fluxer_utils`),
+not the raw `Stream.listen(...)`. Dart can't make this automatic the way
+discord.py's dispatch loop protects `@bot.event` handlers — there's no way
+for a `Stream` to intercept what happens inside a caller's own `.listen()`
+callback — so `.listenSafely()` is the explicit opt-in: a bug in one
+handler gets logged instead of taking the whole bot down.
 
 ## Setup
 

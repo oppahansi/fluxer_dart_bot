@@ -5,9 +5,13 @@ import 'package:fluxer/fluxer.dart';
 /// afterwards). A second, even smaller example alongside
 /// [handlePingCommand] — demonstrates `onGuildCreate` rather than
 /// `onMessageCreate`.
-void handleGuildCreate(GuildCreateEvent event) {
+///
+/// Takes [logger] rather than calling `print` directly, so this goes
+/// through the same `Logger` (and respects the same `minLevel`) as
+/// everything else in the bot — one logging pathway, not two.
+void handleGuildCreate(GuildCreateEvent event, Logger logger) {
   final guild = event.guild;
-  print(
+  logger.info(
     '[guild] ${guild.name} ($guild) — ${guild.memberCount ?? '?'} members, ${guild.roles.length} roles',
   );
 }
