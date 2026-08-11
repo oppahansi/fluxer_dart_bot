@@ -29,6 +29,8 @@ void main() {
           ownerId: Snowflake(2),
           roles: [],
           memberCount: 5,
+          onlineCount: null,
+          vanityUrlCode: null,
         ),
       );
 

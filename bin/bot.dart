@@ -7,6 +7,7 @@ import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
+import 'package:fluxer_dart_bot/commands/invite_command.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
@@ -15,6 +16,7 @@ import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
+import 'package:fluxer_dart_bot/commands/serverinfo_command.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
 import 'package:fluxer_dart_bot/commands/sticker_command.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
@@ -131,7 +133,15 @@ Future<void> main() async {
         'webhook',
         handleWebhook,
         middleware: [requireGuildPermission(PermissionFlag.manageWebhooks)],
-      );
+      )
+      ..command(
+        'invite',
+        handleInvite,
+        middleware: [
+          requireGuildPermission(PermissionFlag.createInstantInvite),
+        ],
+      )
+      ..command('serverinfo', handleServerInfo);
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
     // already logged at INFO by fluxer_dart_gateway itself via the same
