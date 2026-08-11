@@ -25,6 +25,7 @@ Future<void> main() async {
         : Uri.parse(restBaseUrlString),
   );
 
+  bot.connectionStateChanges.listen((state) => print('[state] $state'));
   bot.onReady.listen((event) {
     print(
       'Ready — logged in as ${event.user.username} (session ${event.sessionId})',
@@ -33,7 +34,9 @@ Future<void> main() async {
   bot.onGuildCreate.listen(handleGuildCreate);
   bot.onMessageCreate.listen((event) => handlePingCommand(bot, event));
 
+  print('Logging in...');
   await bot.login();
+  print('login() returned, connection state: ${bot.connectionState}');
 
   // Keep the process alive; login() only awaits the initial connect(),
   // not the connection's lifetime.
