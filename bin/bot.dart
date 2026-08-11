@@ -7,8 +7,10 @@ import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
+import 'package:fluxer_dart_bot/commands/help_command.dart';
 import 'package:fluxer_dart_bot/commands/invite_command.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
+import 'package:fluxer_dart_bot/commands/members_command.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
 import 'package:fluxer_dart_bot/commands/purge_command.dart';
@@ -141,7 +143,9 @@ Future<void> main() async {
           requireGuildPermission(PermissionFlag.createInstantInvite),
         ],
       )
-      ..command('serverinfo', handleServerInfo);
+      ..command('serverinfo', handleServerInfo)
+      ..command('members', handleMembers);
+    commands.command('help', helpCommand(commands));
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is
     // already logged at INFO by fluxer_dart_gateway itself via the same
