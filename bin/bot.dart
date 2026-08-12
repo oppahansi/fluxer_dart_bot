@@ -19,6 +19,8 @@ import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/serverinfo_command.dart';
+import 'package:fluxer_dart_bot/commands/setup_command.dart';
+import 'package:fluxer_dart_bot/commands/setup_on_join.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
 import 'package:fluxer_dart_bot/commands/sticker_command.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
@@ -60,6 +62,9 @@ Future<void> main() async {
     bot.onGuildCreate.listen((event) => handleGuildCreate(event, logger));
     bot.onMessageReactionAdd.listen(
       (event) => handleMessageReactionAdd(event, logger),
+    );
+    bot.onGuildMemberAdd.listen(
+      (event) => handleGuildMemberAddSetupPrompt(event, bot),
     );
 
     final commands = CommandRouter(bot: bot, prefix: '!')
@@ -144,7 +149,8 @@ Future<void> main() async {
         ],
       )
       ..command('serverinfo', handleServerInfo)
-      ..command('members', handleMembers);
+      ..command('members', handleMembers)
+      ..command('setup', handleSetup);
     commands.command('help', helpCommand(commands));
 
     // Connection lifecycle (Connecting/Identifying/Connected/READY/...) is

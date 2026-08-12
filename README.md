@@ -43,10 +43,14 @@ nothing below is needed just to bring the bot online.
 | `!serverinfo` | Guild stats fetched fresh via REST (deliberately bypasses the gateway cache — see the doc comment on `handleServerInfo`) | — |
 | `!members` | Reaction-based pagination over the full member list | — |
 | `!help` | Reaction-based pagination over `CommandRouter.commandNames` | — |
+| `!setup` | Owner-only, DM-based multi-turn setup flow (`UserRestManager.createDm()`) | — (owner-only check, not a permission flag) |
 
 A standing (non-command) listener also logs every reaction added anywhere
 the bot can see (`lib/commands/reaction_add_logger.dart`), demonstrating
-`bot.onMessageReactionAdd` outside of the pagination use case.
+`bot.onMessageReactionAdd` outside of the pagination use case. Another
+(`lib/commands/setup_on_join.dart`) fires the same flow `!setup` does,
+unprompted, the moment the bot's added to a guild — see its own doc
+comment for a caveat on that specific trigger.
 
 ### The reaction-based paginator
 
@@ -57,6 +61,25 @@ reaction so they can click again. Used by `!members` and `!help`.
 Deliberately simple: a fixed idle timeout cancels the listener, and
 nothing persists across a bot restart — a real pagination system would
 need to survive both.
+
+### The DM-based setup flow
+
+`!setup` is this platform's answer to the "ephemeral setup wizard"
+pattern common in Discord bots — Fluxer has no ephemeral messages or
+interactions at all (see "Where this is limited" below), so there's no
+way to reply in a guild channel so only one person sees it. The
+practical equivalent, and the one plenty of pre-interactions-era
+Discord bots used anyway: DM the person who should see it.
+
+Run from inside the guild (`lib/commands/setup_command.dart`), by that
+guild's owner only, it opens a DM (`bot.users.createDm(guild.ownerId)`)
+and hands off to `lib/commands/setup_flow.dart`'s `runSetupFlow()` — a
+couple of question/answer round trips using `lib/commands/
+await_reply.dart`'s `awaitReply()`, which filters `bot.onMessageCreate`
+down to "the next message this specific user sends in this specific
+channel," the same idea as the paginator's reaction-await applied to
+messages instead. No answers are persisted anywhere — this reference
+bot has no database — the flow just echoes a summary back at the end.
 
 ### Logging and handler safety
 
@@ -100,13 +123,11 @@ parity.
   images are the one exception — those go through a plain base64 data
   URI, not the presigned flow, per the OpenAPI spec's own
   `image` field.
-- **No DMs — an SDK gap, not a platform one.** The platform supports
-  this fine: `POST /users/@me/channels` (`recipient_id` → a DM channel)
-  accepts bot auth per the OpenAPI spec. `fluxer_dart_rest` just doesn't
-  have a `.createDm()` method yet, so this bot can currently only talk
-  in guild channels it's been invited into — unlike the other items in
-  this list, this one is a straightforward addition whenever a command
-  actually needs it.
+- **Group DMs are the one DM gap left.** One-to-one DMs work —
+  `UserRestManager.createDm()` and `!setup` above use them — but
+  `CreatePrivateChannelRequest`'s `recipients` array (up to 49 users,
+  for a group DM) isn't wired up, since nothing in this bot needs one
+  yet.
 - **Permission checks are guild-level only.** `requireGuildPermission`
   (in `fluxer_dart`) resolves a member's roles and computes effective
   guild permissions, but it's blind to per-channel permission
