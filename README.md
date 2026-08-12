@@ -100,9 +100,13 @@ parity.
   images are the one exception — those go through a plain base64 data
   URI, not the presigned flow, per the OpenAPI spec's own
   `image` field.
-- **No DMs.** There's no `createDm`-equivalent anywhere in
-  `fluxer_dart_rest` yet, so this bot can only talk in guild channels it's
-  been invited into.
+- **No DMs — an SDK gap, not a platform one.** The platform supports
+  this fine: `POST /users/@me/channels` (`recipient_id` → a DM channel)
+  accepts bot auth per the OpenAPI spec. `fluxer_dart_rest` just doesn't
+  have a `.createDm()` method yet, so this bot can currently only talk
+  in guild channels it's been invited into — unlike the other items in
+  this list, this one is a straightforward addition whenever a command
+  actually needs it.
 - **Permission checks are guild-level only.** `requireGuildPermission`
   (in `fluxer_dart`) resolves a member's roles and computes effective
   guild permissions, but it's blind to per-channel permission
