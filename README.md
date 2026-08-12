@@ -149,6 +149,20 @@ parity.
    dart run bin/bot.dart
    ```
 
+## Fluxer version
+
+Every command in the table above was live-tested against a self-hosted
+Fluxer instance running image tag `v1`, REST API version `1.0.0` (the
+OpenAPI spec's own `info.version`), and gateway protocol version `1`, as
+of 2026-08-12 — see
+[`fluxer_dart_core`](https://github.com/oppahansi/fluxer_dart_core)'s
+README for how that was checked. Fluxer doesn't publish a versioning
+policy or changelog beyond that `info.version` field, so a command
+working here isn't a guarantee it still behaves identically after
+Fluxer updates — several of the commands above only landed on the right
+behavior (permission flag, payload shape, pagination default) after
+live testing contradicted an initial, reasonable-looking assumption.
+
 ## Part of the fluxer_dart ecosystem
 
 | Package | Purpose |
