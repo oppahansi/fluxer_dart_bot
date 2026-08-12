@@ -1,0 +1,29 @@
+name: fluxer_dart_bot
+description: >-
+  Example bot for the fluxer_dart framework — deliberately modest, meant to
+  be read as a reference for how to build a bot with it, not a
+  feature-complete bot.
+version: 0.1.0
+homepage: https://github.com/oppahansi/fluxer_dart_bot
+repository: https://github.com/oppahansi/fluxer_dart_bot
+# Not on pub.dev — this is an example application, not a library.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  # Pinned to a tagged release so a plain `dart pub get` works for
+  # anyone who clones just this repo — pulls in fluxer_dart_core/
+  # fluxer_dart_gateway/fluxer_dart_rest/fluxer_dart_utils transitively
+  # via fluxer_dart's own pinned deps. Local development overrides all
+  # five to sibling directories via pubspec_overrides.yaml (gitignored,
+  # not this file) — see CONTRIBUTING.md.
+  fluxer_dart:
+    git:
+      url: https://github.com/oppahansi/fluxer_dart.git
+      ref: v0.1.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.31.2
