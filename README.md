@@ -14,6 +14,67 @@ along the way (wrong default permission flags, gaps between the
 gateway's cached data and REST, a server-side pagination default that
 silently truncated results).
 
+## What's required vs. what's just this example's style
+
+Almost everything under `lib/commands/` and `bin/bot.dart` is this
+repo's own choice, not something Fluxer or `fluxer_dart` requires. Read
+it as one worked example, not a spec to conform to — pick and choose,
+or ignore all of it and design commands however you'd rather.
+
+**Actually required**, by the platform or the framework:
+
+- A bot token, sent by `fluxer_dart_rest` as `Authorization: Bot
+  <token>` — every bot route needs it.
+- `Bot(token: ...)` and `await bot.login()` — the only way to connect.
+  `login()` only awaits the initial connect, not the connection's
+  lifetime, so the process needs *something* keeping it alive after
+  that (`bin/bot.dart` waits on `SIGINT`; a server process, a different
+  signal, anything that doesn't return works too).
+- Message-content commands (`!name args`, or any prefix/format you
+  design) are the *only* command style Fluxer supports — confirmed
+  against the live OpenAPI spec, no `/interactions` or `/commands` path
+  exists at all. That part isn't this bot's preference; there's nothing
+  else to build against.
+
+**This bot's conventions — swap out, extend, or ignore freely:**
+
+- `CommandRouter`/`.command(name, handler)` and the `!` prefix.
+  `CommandRouter` is convenience sugar `fluxer_dart` offers on top of
+  `Bot`, not a required layer — see
+  [`fluxer_dart`](https://github.com/oppahansi/fluxer_dart)'s own README
+  for a complete bot with no `CommandRouter` at all, just a plain
+  `bot.onMessageCreate.listen(...)` doing its own parsing. Use a
+  different prefix, regex matching, natural-language triggers,
+  whatever fits.
+- `requireGuildPermission(...)` middleware, and which `PermissionFlag`
+  each command is gated on. One reasonable default per command (mirroring
+  what the equivalent Discord permission would be), not a rule Fluxer or
+  `fluxer_dart` enforces — check permissions inline instead, gate on a
+  role id, or skip authorization entirely if that's right for your bot.
+- One command per resource with an action sub-argument (`!channel
+  create|rename|delete`) rather than separate commands per action —
+  purely a style choice to keep the command list short; either works
+  fine with `CommandRouter`.
+- One file per command under `lib/commands/`, one function per file.
+  Organize however reads best to you — classes, closures, everything in
+  one file, code generation — `CommandRouter.command()` just wants a
+  `Future<void> Function(CommandContext)`.
+- The `try { ... } on FluxerApiException catch (e) { ... }` pattern
+  repeated in most commands here, replying with a friendly message
+  instead of letting the error bubble up. A consistency choice for this
+  reference bot, not something enforced anywhere — `runGuarded` (see
+  below) would catch an unhandled one anyway, just less gracefully.
+- `paginator.dart`'s reaction-based pagination and `setup_flow.dart`'s
+  DM-based multi-turn conversation are both *example implementations of
+  a pattern*, not the only correct way to solve either problem. Reply
+  again for the next page instead of editing in place; run a setup flow
+  in a role-restricted guild channel instead of a DM — whatever suits
+  your bot.
+- `PrintLogger` and wrapping `main()` in `runGuarded(...)`. Strongly
+  recommended (skip `runGuarded` and a bug in your own `.listen()`
+  callback can crash the whole process silently), but `Logger` is a
+  pluggable interface (`fluxer_dart_utils`), not a hardcoded dependency.
+
 ## Commands
 
 Connects, logs `READY`, and logs every guild it can see
