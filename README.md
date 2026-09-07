@@ -105,6 +105,16 @@ nothing below is needed just to bring the bot online.
 | `!members` | Reaction-based pagination over the full member list | — |
 | `!help` | Reaction-based pagination over `CommandRouter.commandNames` | — |
 | `!setup` | Owner-only, DM-based multi-turn setup flow (`UserRestManager.createDm()`) | — (owner-only check, not a permission flag) |
+| `!pin` / `!unpin` | Pinning the replied-to message, with an audit log reason | `pinMessages` |
+| `!pins` | Listing pins — the route answers with a page envelope, not a bare array | — |
+| `!typing` | `MessageRestManager.triggerTyping()` around slow work | — |
+| `!upload [text]` | The three-step attachment flow: plan, `PUT` the bytes to presigned storage, then claim it on a message | — |
+| `!reactors <emoji>` | Paging every reacting user with `listReactionUsers()` | — |
+| `!clearreactions [emoji]` | Clearing all reactions, or just one emoji's | `manageMessages` |
+| `!presence <status> [text]` | A gateway command rather than a REST call — no response, and rate limited | — |
+| `!userinfo [user id]` | `Bot.fetchUser()`, cache-first with a REST fallback | — |
+| `!membersearch <query>` | The search index rather than the member list, so it scales past paging every member | — |
+| `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
 
 A standing (non-command) listener also logs every reaction added anywhere
 the bot can see (`lib/commands/reaction_add_logger.dart`), demonstrating
@@ -177,13 +187,14 @@ parity.
   implemented — this bot can see voice channels (`GuildVoiceChannel` in
   `fluxer_dart_core`) but can't join one, play audio, or read voice
   state.
-- **No file/attachment uploads.** Incoming attachments decode fine
-  (`Attachment` in `fluxer_dart_core`), but *sending* one needs Fluxer's
-  presigned-upload flow, which no command here (or `MessageBuilder`/
-  `WebhookExecuteClient` in `fluxer_dart_rest`) implements. Emoji/sticker
-  images are the one exception — those go through a plain base64 data
-  URI, not the presigned flow, per the OpenAPI spec's own
-  `image` field.
+- **Attachments upload, but not through a webhook.**
+  `AttachmentRestManager` implements the presigned flow and `!upload`
+  uses it, so a normal message can carry a file. `WebhookExecuteClient`
+  still cannot — the route accepts attachments, they are just not
+  modelled there. Emoji and sticker images remain a separate path: those
+  take a plain base64 data URI rather than the presigned flow, per the
+  spec's own `image` field. A bot token is clamped to 50 MiB per file
+  regardless of the deployment's configured limit.
 - **Group DMs are the one DM gap left.** One-to-one DMs work —
   `UserRestManager.createDm()` and `!setup` above use them — but
   `CreatePrivateChannelRequest`'s `recipients` array (up to 49 users,
@@ -202,10 +213,12 @@ parity.
   else (including any thread-like channel type Fluxer might add) decodes
   as `UnknownChannel` rather than crashing, but this bot has no
   thread-aware commands.
-- **No presence/typing-indicator-driven behavior.** `onTypingStart` is
-  wired at the SDK level, but nothing here reacts to it, and there's no
-  presence (`online`/`idle`/`dnd`) event stream at all yet — `!serverinfo`
-  only gets an aggregate `online_count`, not per-member presence.
+- **Presence is write-only.** `!presence` publishes the bot's own
+  status, but `PRESENCE_UPDATE` is not modelled as a typed event, so
+  reading other members' presence means handling
+  `UnknownDispatchEvent` by name. `!serverinfo` gets an aggregate
+  `online_count`, not per-member presence. `onTypingStart` is wired at
+  the SDK level but nothing here reacts to it.
 - **Pagination doesn't survive a restart.** `sendPaginated()`'s reaction
   listeners are in-memory and time out after a fixed idle window; a
   paginated `!members`/`!help` message stops responding to clicks once
@@ -240,7 +253,7 @@ parity.
 Every command in the table above was live-tested against a self-hosted
 Fluxer instance running image tag `v1`, REST API version `1.0.0` (the
 OpenAPI spec's own `info.version`), and gateway protocol version `1`, as
-of 2026-08-12 — see
+of 2026-09-07 — see
 [`fluxer_dart_core`](https://github.com/oppahansi/fluxer_dart_core)'s
 README for how that was checked. Fluxer doesn't publish a versioning
 policy or changelog beyond that `info.version` field, so a command

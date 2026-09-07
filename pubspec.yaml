@@ -3,7 +3,7 @@ description: >-
   Example bot for the fluxer_dart framework — deliberately modest, meant to
   be read as a reference for how to build a bot with it, not a
   feature-complete bot.
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/oppahansi/fluxer_dart_bot
 repository: https://github.com/oppahansi/fluxer_dart_bot
 # Not on pub.dev — this is an example application, not a library.
@@ -22,7 +22,7 @@ dependencies:
   fluxer_dart:
     git:
       url: https://github.com/oppahansi/fluxer_dart.git
-      ref: v0.1.0
+      ref: v0.2.0
 
 dev_dependencies:
   lints: ^6.1.0

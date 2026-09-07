@@ -8,14 +8,21 @@ import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/help_command.dart';
+import 'package:fluxer_dart_bot/commands/instance_command.dart';
 import 'package:fluxer_dart_bot/commands/invite_command.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
 import 'package:fluxer_dart_bot/commands/members_command.dart';
+import 'package:fluxer_dart_bot/commands/membersearch_command.dart';
+import 'package:fluxer_dart_bot/commands/moderation_logger.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
+import 'package:fluxer_dart_bot/commands/pin_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
+import 'package:fluxer_dart_bot/commands/pins_update_logger.dart';
+import 'package:fluxer_dart_bot/commands/presence_command.dart';
 import 'package:fluxer_dart_bot/commands/purge_command.dart';
 import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
+import 'package:fluxer_dart_bot/commands/reactions_command.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/serverinfo_command.dart';
@@ -24,6 +31,9 @@ import 'package:fluxer_dart_bot/commands/setup_on_join.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
 import 'package:fluxer_dart_bot/commands/sticker_command.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
+import 'package:fluxer_dart_bot/commands/typing_command.dart';
+import 'package:fluxer_dart_bot/commands/upload_command.dart';
+import 'package:fluxer_dart_bot/commands/userinfo_command.dart';
 import 'package:fluxer_dart_bot/commands/webhook_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
@@ -66,6 +76,10 @@ Future<void> main() async {
     bot.onGuildMemberAdd.listen(
       (event) => handleGuildMemberAddSetupPrompt(event, bot),
     );
+    bot.onChannelPinsUpdate.listen(
+      (event) => handleChannelPinsUpdate(event, bot, logger),
+    );
+    registerModerationLoggers(bot, logger);
 
     final commands = CommandRouter(bot: bot, prefix: '!')
       ..command(
@@ -148,6 +162,29 @@ Future<void> main() async {
           requireGuildPermission(PermissionFlag.createInstantInvite),
         ],
       )
+      ..command(
+        'pin',
+        handlePin,
+        middleware: [requireGuildPermission(PermissionFlag.pinMessages)],
+      )
+      ..command(
+        'unpin',
+        handleUnpin,
+        middleware: [requireGuildPermission(PermissionFlag.pinMessages)],
+      )
+      ..command('pins', handlePins)
+      ..command('typing', handleTyping)
+      ..command('upload', handleUpload)
+      ..command('reactors', handleReactors)
+      ..command(
+        'clearreactions',
+        handleClearReactions,
+        middleware: [requireGuildPermission(PermissionFlag.manageMessages)],
+      )
+      ..command('presence', handlePresence)
+      ..command('userinfo', handleUserInfo)
+      ..command('membersearch', handleMemberSearch)
+      ..command('instance', handleInstance)
       ..command('serverinfo', handleServerInfo)
       ..command('members', handleMembers)
       ..command('setup', handleSetup);

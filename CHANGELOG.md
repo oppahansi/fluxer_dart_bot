@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+- New commands demonstrating the capabilities added in the 0.2.0
+  packages: `!pin` / `!unpin` / `!pins`, `!typing`, `!upload`,
+  `!reactors`, `!clearreactions`, `!presence`, `!userinfo`,
+  `!membersearch` and `!instance`.
+- New standing listeners: `pins_update_logger.dart` re-lists a channel's
+  pins when they change, since the event carries no message, and
+  `moderation_logger.dart` wires up the bulk-delete, reaction-clearing,
+  emoji, sticker, webhook, invite and audit-log streams.
+
 ## 0.1.0 — Initial release
 
 Every command below was live-tested against a real self-hosted Fluxer
