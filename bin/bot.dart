@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fluxer_dart/fluxer_dart.dart';
+import 'package:fluxer_dart_bot/commands/announce_command.dart';
 import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
 import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
@@ -23,6 +24,7 @@ import 'package:fluxer_dart_bot/commands/purge_command.dart';
 import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
 import 'package:fluxer_dart_bot/commands/reactions_command.dart';
+import 'package:fluxer_dart_bot/commands/refresh_urls_command.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
 import 'package:fluxer_dart_bot/commands/serverinfo_command.dart';
@@ -185,6 +187,19 @@ Future<void> main() async {
       ..command('userinfo', handleUserInfo)
       ..command('membersearch', handleMemberSearch)
       ..command('instance', handleInstance)
+      ..command(
+        'announce',
+        handleAnnounce,
+        middleware: [requireGuildPermission(PermissionFlag.manageChannels)],
+      )
+      ..command(
+        'follow',
+        handleFollow,
+        middleware: [requireGuildPermission(PermissionFlag.manageWebhooks)],
+      )
+      ..command('publish', handlePublish)
+      ..command('source', handleCrosspostSource)
+      ..command('refreshurls', handleRefreshUrls)
       ..command('serverinfo', handleServerInfo)
       ..command('members', handleMembers)
       ..command('setup', handleSetup);

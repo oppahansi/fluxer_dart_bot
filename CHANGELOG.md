@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+- New commands for announcement channels: `!announce create|stats`,
+  `!follow <channel id>`, `!publish` and `!source`. They are separate
+  commands rather than subcommands of one because each needs a different
+  permission — creating needs `manageChannels`, following needs
+  `manageWebhooks` in the subscribing channel, and publishing needs
+  neither beyond what the API enforces itself.
+- `!refreshurls` re-signs the attachment URLs on the replied-to message.
+- `!webhook create` now handles a webhook that comes back without a
+  token instead of assuming one is always present.
+
 ## 0.2.0
 
 - New commands demonstrating the capabilities added in the 0.2.0

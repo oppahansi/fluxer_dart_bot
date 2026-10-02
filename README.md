@@ -115,6 +115,11 @@ nothing below is needed just to bring the bot online.
 | `!userinfo [user id]` | `Bot.fetchUser()`, cache-first with a REST fallback | — |
 | `!membersearch <query>` | The search index rather than the member list, so it scales past paging every member | — |
 | `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
+| `!announce create\|stats` | Announcement channels — a channel of type `GUILD_ANNOUNCEMENT`, plus how widely it is followed | `manageChannels` |
+| `!follow <channel id>` | Subscribing this channel to an announcement channel. Creates a channel follower webhook, which is what delivers the copies | `manageWebhooks` |
+| `!publish` | Crossposting the replied-to message to every following channel | — (the API enforces `manageMessages` for others' messages) |
+| `!source` | The source guild of a crossposted copy | — |
+| `!refreshurls` | Re-signing attachment URLs, which expire | — |
 
 A standing (non-command) listener also logs every reaction added anywhere
 the bot can see (`lib/commands/reaction_add_logger.dart`), demonstrating
@@ -209,10 +214,11 @@ parity.
   without Discord's own channel-overwrite resolution step layered on
   top. Documented as a known gap since BM3, not silently wrong.
 - **No threads or forum channels modeled.** `Channel`'s sealed hierarchy
-  in `fluxer_dart_core` covers text/voice/category/DM/group-DM — anything
-  else (including any thread-like channel type Fluxer might add) decodes
-  as `UnknownChannel` rather than crashing, but this bot has no
-  thread-aware commands.
+  in `fluxer_dart_core` covers
+  text/announcement/voice/category/DM/group-DM — anything else (including
+  any thread-like channel type Fluxer might add) decodes as
+  `UnknownChannel` rather than crashing, but this bot has no thread-aware
+  commands.
 - **Presence is write-only.** `!presence` publishes the bot's own
   status, but `PRESENCE_UPDATE` is not modelled as a typed event, so
   reading other members' presence means handling

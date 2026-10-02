@@ -35,12 +35,27 @@ Future<void> handleWebhook(CommandContext context) async {
           name: name,
         );
 
+        // A webhook created here is always an incoming one, so it has a
+        // token; a channel follower webhook would not, and cannot be
+        // posted to at all.
+        final token = webhook.token;
+        if (token == null) {
+          await context.reply(
+            MessageBuilder(
+              content:
+                  'Created webhook "$name" (${webhook.id}), but it carries '
+                  'no token, so nothing can be posted through it.',
+            ),
+          );
+          return;
+        }
+
         final executeClient = WebhookExecuteClient(
           transport: context.bot.rest.transport,
         );
         await executeClient.execute(
           webhook.id,
-          webhook.token,
+          token,
           content: 'Hello from webhook "$name"!',
           username: name,
         );
