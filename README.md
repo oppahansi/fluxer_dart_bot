@@ -120,6 +120,10 @@ nothing below is needed just to bring the bot online.
 | `!publish` | Crossposting the replied-to message to every following channel | — (the API enforces `manageMessages` for others' messages) |
 | `!source` | The source guild of a crossposted copy | — |
 | `!refreshurls` | Re-signing attachment URLs, which expire | — |
+| `!thread start\|private <name>` | Starting a thread. As a reply, `start` starts it from the replied-to message and the thread takes that message's id | `manageThreads` |
+| `!thread list` | Every active thread in the guild, with the bot's own memberships joined in from the separate `members` list | `manageThreads` |
+| `!thread rename\|archive\|lock\|members` | Run inside a thread: `ThreadUpdateBuilder`, and listing thread members with their guild member | `manageThreads` |
+| `!forum create\|tag\|post` | Forum channels. A post is a thread created together with its first message, so it goes through `ThreadRestManager.createPost` | `manageChannels` |
 
 A standing (non-command) listener also logs every reaction added anywhere
 the bot can see (`lib/commands/reaction_add_logger.dart`), demonstrating
@@ -213,12 +217,13 @@ parity.
   same as Discord's `MANAGE_CHANNELS` at the guild level would, just
   without Discord's own channel-overwrite resolution step layered on
   top. Documented as a known gap since BM3, not silently wrong.
-- **No threads or forum channels modeled.** `Channel`'s sealed hierarchy
-  in `fluxer_dart_core` covers
-  text/announcement/voice/category/DM/group-DM — anything else (including
-  any thread-like channel type Fluxer might add) decodes as
-  `UnknownChannel` rather than crashing, but this bot has no thread-aware
-  commands.
+- **Threads are covered only as far as the commands above.** Thread
+  search, forum post data, forum unread counts and thread notification
+  settings are not wired up. `!thread` is gated on `manageThreads` as a
+  whole even though starting a thread only needs `createPublicThreads`,
+  for the same one-flag-per-command reason as the rest of this bot. The
+  guild-level permission check above also knows nothing about thread
+  permissions being computed from the parent channel.
 - **Presence is write-only.** `!presence` publishes the bot's own
   status, but `PRESENCE_UPDATE` is not modelled as a typed event, so
   reading other members' presence means handling

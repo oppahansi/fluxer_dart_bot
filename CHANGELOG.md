@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+- `!thread start|private|list|rename|archive|lock|members`. `start` used
+  as a reply starts the thread from the replied-to message.
+- `!forum create|tag|post` for forum channels, tags and posts.
+- A thread logger reports thread creation, updates, deletion and
+  membership changes from the gateway.
+
 ## 0.3.0
 
 - New commands for announcement channels: `!announce create|stats`,

@@ -7,6 +7,7 @@ import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
+import 'package:fluxer_dart_bot/commands/forum_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/help_command.dart';
 import 'package:fluxer_dart_bot/commands/instance_command.dart';
@@ -32,6 +33,8 @@ import 'package:fluxer_dart_bot/commands/setup_command.dart';
 import 'package:fluxer_dart_bot/commands/setup_on_join.dart';
 import 'package:fluxer_dart_bot/commands/slowmode_command.dart';
 import 'package:fluxer_dart_bot/commands/sticker_command.dart';
+import 'package:fluxer_dart_bot/commands/thread_command.dart';
+import 'package:fluxer_dart_bot/commands/thread_logger.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
 import 'package:fluxer_dart_bot/commands/typing_command.dart';
 import 'package:fluxer_dart_bot/commands/upload_command.dart';
@@ -82,6 +85,7 @@ Future<void> main() async {
       (event) => handleChannelPinsUpdate(event, bot, logger),
     );
     registerModerationLoggers(bot, logger);
+    registerThreadLoggers(bot, logger);
 
     final commands = CommandRouter(bot: bot, prefix: '!')
       ..command(
@@ -200,6 +204,16 @@ Future<void> main() async {
       ..command('publish', handlePublish)
       ..command('source', handleCrosspostSource)
       ..command('refreshurls', handleRefreshUrls)
+      ..command(
+        'thread',
+        handleThread,
+        middleware: [requireGuildPermission(PermissionFlag.manageThreads)],
+      )
+      ..command(
+        'forum',
+        handleForum,
+        middleware: [requireGuildPermission(PermissionFlag.manageChannels)],
+      )
       ..command('serverinfo', handleServerInfo)
       ..command('members', handleMembers)
       ..command('setup', handleSetup);
