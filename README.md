@@ -117,6 +117,11 @@ nothing below is needed just to bring the bot online.
 | `!membersearch <query>` | The search index rather than the member list, so it scales past paging every member | — |
 | `!memberquery [prefix]` | `Bot.queryMembers()`: members with presences over the gateway, and the 30-second budget on the full list | — |
 | `!nick <name>\|reset` | The bot's own guild profile through the `@me` member routes, `CurrentMemberUpdateBuilder` | `manageNicknames` |
+| `!watch <user_id>` | `Bot.subscribe()` with `GuildSubscription.members`, the only way a bot receives `PRESENCE_UPDATE` | — |
+| `!counts` | `Bot.guildCounts()`/`channelMemberCounts()`: online counts over the gateway, which REST does not have | — |
+| `!memberlist` | A member list subscription and the `GUILD_MEMBER_LIST_UPDATE` it produces; inside a thread, the thread's member list | — |
+| `!voice` | `Bot.voiceStates()`, seeded by `GUILD_CREATE` and kept current by `VOICE_STATE_UPDATE`, no request made | — |
+| `!unreads <forum_id>` | `Bot.forumUnreads()`: reply counts per post, acknowledging each post's first message | — |
 | `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
 | `!announce create\|stats` | Announcement channels — a channel of type `GUILD_ANNOUNCEMENT`, plus how widely it is followed | `manageChannels` |
 | `!follow <channel id>` | Subscribing this channel to an announcement channel. Creates a channel follower webhook, which is what delivers the copies | `manageWebhooks` |

@@ -6,6 +6,7 @@ import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
 import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/channels_command.dart';
+import 'package:fluxer_dart_bot/commands/counts_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/forum_command.dart';
@@ -15,8 +16,9 @@ import 'package:fluxer_dart_bot/commands/instance_command.dart';
 import 'package:fluxer_dart_bot/commands/invite_command.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
 import 'package:fluxer_dart_bot/commands/layout_logger.dart';
-import 'package:fluxer_dart_bot/commands/members_command.dart';
+import 'package:fluxer_dart_bot/commands/memberlist_command.dart';
 import 'package:fluxer_dart_bot/commands/memberquery_command.dart';
+import 'package:fluxer_dart_bot/commands/members_command.dart';
 import 'package:fluxer_dart_bot/commands/membersearch_command.dart';
 import 'package:fluxer_dart_bot/commands/moderation_logger.dart';
 import 'package:fluxer_dart_bot/commands/nick_command.dart';
@@ -25,6 +27,7 @@ import 'package:fluxer_dart_bot/commands/pin_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
 import 'package:fluxer_dart_bot/commands/pins_update_logger.dart';
 import 'package:fluxer_dart_bot/commands/presence_command.dart';
+import 'package:fluxer_dart_bot/commands/presence_logger.dart';
 import 'package:fluxer_dart_bot/commands/purge_command.dart';
 import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
@@ -41,8 +44,11 @@ import 'package:fluxer_dart_bot/commands/thread_command.dart';
 import 'package:fluxer_dart_bot/commands/thread_logger.dart';
 import 'package:fluxer_dart_bot/commands/timeout_command.dart';
 import 'package:fluxer_dart_bot/commands/typing_command.dart';
+import 'package:fluxer_dart_bot/commands/unreads_command.dart';
 import 'package:fluxer_dart_bot/commands/upload_command.dart';
 import 'package:fluxer_dart_bot/commands/userinfo_command.dart';
+import 'package:fluxer_dart_bot/commands/voice_command.dart';
+import 'package:fluxer_dart_bot/commands/watch_command.dart';
 import 'package:fluxer_dart_bot/commands/webhook_command.dart';
 import 'package:fluxer_dart_bot/env.dart';
 
@@ -91,6 +97,7 @@ Future<void> main() async {
     registerModerationLoggers(bot, logger);
     registerThreadLoggers(bot, logger);
     registerLayoutLoggers(bot, logger);
+    registerPresenceLoggers(bot, logger);
 
     final commands = CommandRouter(bot: bot, prefix: '!')
       ..command(
@@ -223,6 +230,11 @@ Future<void> main() async {
       ..command('members', handleMembers)
       ..command('channels', handleChannels)
       ..command('memberquery', handleMemberQuery)
+      ..command('watch', handleWatch)
+      ..command('counts', handleCounts)
+      ..command('memberlist', handleMemberList)
+      ..command('voice', handleVoice)
+      ..command('unreads', handleUnreads)
       ..command(
         'nick',
         handleNick,

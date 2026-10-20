@@ -10,6 +10,13 @@
   gateway, including the full-list rate limit.
 - A layout logger for channel and role reorders and for changes to the
   bot's own user.
+- `!watch <user_id>`: subscribe to a member's presence.
+- `!counts`: guild and channel member and online counts.
+- `!memberlist`: a live member list window, or a thread's member list
+  when run inside a thread.
+- `!voice`: who is connected to voice, from the cached voice states.
+- `!unreads <forum_id>`: reply counts per forum post.
+- A presence, voice and guild sync logger.
 
 ## 0.4.0
 
