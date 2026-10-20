@@ -30,6 +30,7 @@
 - API errors in replies now include the rejected fields.
 - The reaction logger also logs batched DM reactions, for a bot that
   sets the debounce session flag.
+- Pins `fluxer_dart` 0.5.0.
 
 ## 0.4.0
 
