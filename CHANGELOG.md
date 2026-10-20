@@ -28,6 +28,8 @@
 - `!forgetme`: deletes all of the bot's messages in the guild, guild
   owner only, after a typed confirmation.
 - API errors in replies now include the rejected fields.
+- The reaction logger also logs batched DM reactions, for a bot that
+  sets the debounce session flag.
 
 ## 0.4.0
 

@@ -94,6 +94,9 @@ Future<void> main() async {
     bot.onMessageReactionAdd.listen(
       (event) => handleMessageReactionAdd(event, logger),
     );
+    bot.onMessageReactionAddMany.listen(
+      (event) => handleMessageReactionAddMany(event, logger),
+    );
     bot.onGuildMemberAdd.listen(
       (event) => handleGuildMemberAddSetupPrompt(event, bot),
     );
