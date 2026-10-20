@@ -9,7 +9,9 @@ import 'guild_context.dart';
 Future<void> handleSticker(CommandContext context) async {
   if (context.args.isEmpty) {
     await context.reply(
-      MessageBuilder(content: 'Usage: `!sticker add|clone|delete ...`'),
+      MessageBuilder(
+        content: 'Usage: `!sticker add|clone|info|rename|delete ...`',
+      ),
     );
     return;
   }
@@ -62,6 +64,47 @@ Future<void> handleSticker(CommandContext context) async {
           ),
         );
 
+      case 'info':
+        final stickerId = rest.isEmpty ? null : int.tryParse(rest.first);
+        if (stickerId == null) {
+          await context.reply(
+            MessageBuilder(content: 'Usage: `!sticker info <sticker_id>`'),
+          );
+          return;
+        }
+        final info = await context.bot.stickers.metadata(Snowflake(stickerId));
+        await context.reply(
+          MessageBuilder(
+            content:
+                '`${info.name}` from guild ${info.guildId}; '
+                '${info.allowCloning ? 'can' : 'cannot'} be cloned.',
+          ),
+        );
+
+      case 'rename':
+        final stickerId = rest.isEmpty ? null : int.tryParse(rest.first);
+        if (stickerId == null || rest.length < 2) {
+          await context.reply(
+            MessageBuilder(
+              content: 'Usage: `!sticker rename <sticker_id> <name> [tags...]`',
+            ),
+          );
+          return;
+        }
+        final updated = await context.bot.stickers.update(
+          guildId,
+          Snowflake(stickerId),
+          name: rest[1],
+          tags: rest.length > 2 ? rest.skip(2).toList() : null,
+        );
+        await context.reply(
+          MessageBuilder(
+            content:
+                'Sticker is now `${updated.name}`, tags: '
+                '${updated.tags.isEmpty ? 'none' : updated.tags.join(', ')}.',
+          ),
+        );
+
       case 'delete':
         final stickerId = rest.isEmpty ? null : int.tryParse(rest.first);
         if (stickerId == null) {
@@ -78,7 +121,8 @@ Future<void> handleSticker(CommandContext context) async {
       default:
         await context.reply(
           MessageBuilder(
-            content: 'Unknown action `$action`. Use add, clone, or delete.',
+            content:
+                'Unknown action `$action`. Use add, clone, info, rename, or delete.',
           ),
         );
     }

@@ -89,7 +89,7 @@ nothing below is needed just to bring the bot online.
 | `!reply` | `MessageBuilder.replyTo()` — a real reply reference, not just same-channel | — |
 | `!react` | `MessageRestManager.addReaction()` | — |
 | `!purge <1-100>` | Listing + `bulkDelete()` | `manageMessages` |
-| `!channel create\|rename\|move\|delete` | Channel CRUD, `ChannelCreateBuilder`/`ChannelUpdateBuilder`, and `move` through the guild-wide reorder route | `manageChannels` |
+| `!channel create\|rename\|move\|nest\|delete` | Channel CRUD, `ChannelCreateBuilder`/`ChannelUpdateBuilder`, `move` through the guild-wide reorder route, `nest` into or out of a category | `manageChannels` |
 | `!channels` | `GuildRestManager.listChannels()`, laid out by category and position with `Channel.parentId`/`Channel.position` | — |
 | `!slowmode <seconds>` | Per-channel rate limiting | `manageChannels` |
 | `!permission set\|clear <role_id> <flag>` | Role-scoped channel permission overwrites | `manageRoles` |
@@ -98,10 +98,10 @@ nothing below is needed just to bring the bot online.
 | `!timeout <minutes> [reason]` | Member timeout (`0` clears it) | `moderateMembers` |
 | `!role list\|create\|delete\|rename\|color\|hoist\|move\|add\|remove` | Guild role CRUD, `GuildRoleUpdateBuilder`, reordering, and member role assignment | `manageRoles` |
 | `!auditlog [count]` | `GuildRestManager.getAuditLogs()` | `viewAuditLog` |
-| `!emoji add\|clone\|delete` | Custom emoji management, data-URI image upload | `createExpressions` |
-| `!sticker add\|clone\|delete` | Custom sticker management | `createExpressions` |
-| `!webhook create <name>` / `!webhook delete <id>` | Webhook creation **and** the separate token-based execute path (`WebhookExecuteClient`, no bot auth at all) | `manageWebhooks` |
-| `!invite create` / `!invite delete <code>` | Channel invite management | `createInstantInvite` |
+| `!emoji add\|clone\|info\|delete` | Custom emoji management, data-URI image upload, metadata of any emoji by id | `createExpressions` |
+| `!sticker add\|clone\|info\|rename\|delete` | Custom sticker management, metadata, renaming and retagging | `createExpressions` |
+| `!webhook create <name>` / `!webhook relay <text>` / `!webhook delete <id>` | Webhook creation **and** the separate token-based execute path (`WebhookExecuteClient`, no bot auth at all) | `manageWebhooks` |
+| `!invite create\|list` / `!invite delete <code>` | Channel invite management | `createInstantInvite` |
 | `!serverinfo` | Guild stats fetched fresh via REST (deliberately bypasses the gateway cache — see the doc comment on `handleServerInfo`) | — |
 | `!members` | Reaction-based pagination over the full member list | — |
 | `!help` | Reaction-based pagination over `CommandRouter.commandNames` | — |
@@ -122,6 +122,12 @@ nothing below is needed just to bring the bot online.
 | `!memberlist` | A member list subscription and the `GUILD_MEMBER_LIST_UPDATE` it produces; inside a thread, the thread's member list | — |
 | `!voice` | `Bot.voiceStates()`, seeded by `GUILD_CREATE` and kept current by `VOICE_STATE_UPDATE`, no request made | — |
 | `!unreads <forum_id>` | `Bot.forumUnreads()`: reply counts per post, acknowledging each post's first message | — |
+| `!search <text>` | `MessageSearchBuilder` over the guild's messages, and the not-yet-indexed answer | — |
+| `!discovery categories\|browse\|status\|apply\|withdraw` | `Bot.discovery`: browsing listed guilds and this guild's application | `manageGuild` |
+| `!appinfo` | `UserRestManager.application()` — the bot's own OAuth2 application | — |
+| `!profile [user_id]` | `UserRestManager.profile()` with the guild profile and mutual guilds | — |
+| `!vanity [code\|clear]` | Vanity invite codes, and how `FluxerApiException.fieldErrors` explains a rejection | `manageGuild` |
+| `!forgetme` | `deleteAllOwnMessagesInGuild()` behind a typed confirmation, since the API asks a bot for none | guild owner |
 | `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
 | `!announce create\|stats` | Announcement channels — a channel of type `GUILD_ANNOUNCEMENT`, plus how widely it is followed | `manageChannels` |
 | `!follow <channel id>` | Subscribing this channel to an announcement channel. Creates a channel follower webhook, which is what delivers the copies | `manageWebhooks` |
@@ -131,7 +137,7 @@ nothing below is needed just to bring the bot online.
 | `!thread start\|private <name>` | Starting a thread. As a reply, `start` starts it from the replied-to message and the thread takes that message's id | `manageThreads` |
 | `!thread list` | Every active thread in the guild, with the bot's own memberships joined in from the separate `members` list | `manageThreads` |
 | `!thread rename\|archive\|lock\|members` | Run inside a thread: `ThreadUpdateBuilder`, and listing thread members with their guild member | `manageThreads` |
-| `!forum create\|tag\|post` | Forum channels. A post is a thread created together with its first message, so it goes through `ThreadRestManager.createPost` | `manageChannels` |
+| `!forum create\|tag\|post\|search\|posts` | Forum channels. A post is a thread created together with its first message, so it goes through `ThreadRestManager.createPost` | `manageChannels` |
 
 A standing (non-command) listener also logs every reaction added anywhere
 the bot can see (`lib/commands/reaction_add_logger.dart`), demonstrating

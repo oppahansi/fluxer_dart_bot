@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:fluxer_dart/fluxer_dart.dart';
 import 'package:fluxer_dart_bot/commands/announce_command.dart';
+import 'package:fluxer_dart_bot/commands/appinfo_command.dart';
 import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
 import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
 import 'package:fluxer_dart_bot/commands/channels_command.dart';
 import 'package:fluxer_dart_bot/commands/counts_command.dart';
+import 'package:fluxer_dart_bot/commands/discovery_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
+import 'package:fluxer_dart_bot/commands/forgetme_command.dart';
 import 'package:fluxer_dart_bot/commands/forum_command.dart';
 import 'package:fluxer_dart_bot/commands/guild_create_logger.dart';
 import 'package:fluxer_dart_bot/commands/help_command.dart';
@@ -28,6 +31,7 @@ import 'package:fluxer_dart_bot/commands/ping_command.dart';
 import 'package:fluxer_dart_bot/commands/pins_update_logger.dart';
 import 'package:fluxer_dart_bot/commands/presence_command.dart';
 import 'package:fluxer_dart_bot/commands/presence_logger.dart';
+import 'package:fluxer_dart_bot/commands/profile_command.dart';
 import 'package:fluxer_dart_bot/commands/purge_command.dart';
 import 'package:fluxer_dart_bot/commands/react_command.dart';
 import 'package:fluxer_dart_bot/commands/reaction_add_logger.dart';
@@ -35,6 +39,7 @@ import 'package:fluxer_dart_bot/commands/reactions_command.dart';
 import 'package:fluxer_dart_bot/commands/refresh_urls_command.dart';
 import 'package:fluxer_dart_bot/commands/reply_command.dart';
 import 'package:fluxer_dart_bot/commands/role_command.dart';
+import 'package:fluxer_dart_bot/commands/search_command.dart';
 import 'package:fluxer_dart_bot/commands/serverinfo_command.dart';
 import 'package:fluxer_dart_bot/commands/setup_command.dart';
 import 'package:fluxer_dart_bot/commands/setup_on_join.dart';
@@ -47,6 +52,7 @@ import 'package:fluxer_dart_bot/commands/typing_command.dart';
 import 'package:fluxer_dart_bot/commands/unreads_command.dart';
 import 'package:fluxer_dart_bot/commands/upload_command.dart';
 import 'package:fluxer_dart_bot/commands/userinfo_command.dart';
+import 'package:fluxer_dart_bot/commands/vanity_command.dart';
 import 'package:fluxer_dart_bot/commands/voice_command.dart';
 import 'package:fluxer_dart_bot/commands/watch_command.dart';
 import 'package:fluxer_dart_bot/commands/webhook_command.dart';
@@ -235,6 +241,20 @@ Future<void> main() async {
       ..command('memberlist', handleMemberList)
       ..command('voice', handleVoice)
       ..command('unreads', handleUnreads)
+      ..command('search', handleSearch)
+      ..command('appinfo', handleAppInfo)
+      ..command('profile', handleProfile)
+      ..command(
+        'discovery',
+        handleDiscovery,
+        middleware: [requireGuildPermission(PermissionFlag.manageGuild)],
+      )
+      ..command(
+        'vanity',
+        handleVanity,
+        middleware: [requireGuildPermission(PermissionFlag.manageGuild)],
+      )
+      ..command('forgetme', handleForgetMe)
       ..command(
         'nick',
         handleNick,

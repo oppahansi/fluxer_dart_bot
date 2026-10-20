@@ -17,6 +17,17 @@
 - `!voice`: who is connected to voice, from the cached voice states.
 - `!unreads <forum_id>`: reply counts per forum post.
 - A presence, voice and guild sync logger.
+- `!search <text>`: message search, including the not-yet-indexed case.
+- `!forum search|posts`: thread search and forum post data; forums
+  created with `!forum create` now set their defaults.
+- `!discovery categories|browse|status|apply|withdraw`.
+- `!appinfo`, `!profile [user_id]`, `!vanity [code|clear]`.
+- `!channel nest <category_id|none>`, `!invite list`, `!emoji info`,
+  `!sticker info|rename`.
+- `!webhook relay <text>`: every webhook token route in one flow.
+- `!forgetme`: deletes all of the bot's messages in the guild, guild
+  owner only, after a typed confirmation.
+- API errors in replies now include the rejected fields.
 
 ## 0.4.0
 

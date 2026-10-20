@@ -1,13 +1,14 @@
 import 'package:fluxer_dart/fluxer_dart.dart';
 
-/// `!invite create` / `!invite delete <code>` — `create` takes no
+/// `!invite create` / `!invite list` / `!invite delete <code>` — `list`
+/// shows this channel's invites only; `create` takes no
 /// further arguments and lets the server pick its own defaults for
 /// max uses/age (`InviteRestManager.createForChannel` only sends
 /// `max_uses`/`max_age`/`unique` when explicitly given).
 Future<void> handleInvite(CommandContext context) async {
   if (context.args.isEmpty) {
     await context.reply(
-      MessageBuilder(content: 'Usage: `!invite create|delete ...`'),
+      MessageBuilder(content: 'Usage: `!invite create|list|delete ...`'),
     );
     return;
   }
@@ -25,6 +26,18 @@ Future<void> handleInvite(CommandContext context) async {
           MessageBuilder(content: 'Created invite: `${invite.code}`'),
         );
 
+      case 'list':
+        final invites = await context.bot.invites.listForChannel(
+          context.message.channelId,
+        );
+        await context.reply(
+          MessageBuilder(
+            content: invites.isEmpty
+                ? 'No invites for this channel.'
+                : invites.map((i) => '`${i.code}`').join(', '),
+          ),
+        );
+
       case 'delete':
         if (rest.isEmpty) {
           await context.reply(
@@ -40,7 +53,7 @@ Future<void> handleInvite(CommandContext context) async {
       default:
         await context.reply(
           MessageBuilder(
-            content: 'Unknown action `$action`. Use create or delete.',
+            content: 'Unknown action `$action`. Use create, list or delete.',
           ),
         );
     }

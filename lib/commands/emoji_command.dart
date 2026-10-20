@@ -10,7 +10,7 @@ import 'guild_context.dart';
 Future<void> handleEmoji(CommandContext context) async {
   if (context.args.isEmpty) {
     await context.reply(
-      MessageBuilder(content: 'Usage: `!emoji add|clone|delete ...`'),
+      MessageBuilder(content: 'Usage: `!emoji add|clone|info|delete ...`'),
     );
     return;
   }
@@ -61,6 +61,26 @@ Future<void> handleEmoji(CommandContext context) async {
           ),
         );
 
+      case 'info':
+        final emojiId = rest.isEmpty ? null : int.tryParse(rest.first);
+        if (emojiId == null) {
+          await context.reply(
+            MessageBuilder(content: 'Usage: `!emoji info <emoji_id>`'),
+          );
+          return;
+        }
+        // Works for an emoji of any guild, not only this one: the
+        // metadata route needs nothing but the id.
+        final info = await context.bot.emojis.metadata(Snowflake(emojiId));
+        await context.reply(
+          MessageBuilder(
+            content:
+                '`${info.name}` from guild ${info.guildId}'
+                '${info.animated ? ', animated' : ''}; '
+                '${info.allowCloning ? 'can' : 'cannot'} be cloned.',
+          ),
+        );
+
       case 'delete':
         final emojiId = rest.isEmpty ? null : int.tryParse(rest.first);
         if (emojiId == null) {
@@ -75,7 +95,8 @@ Future<void> handleEmoji(CommandContext context) async {
       default:
         await context.reply(
           MessageBuilder(
-            content: 'Unknown action `$action`. Use add, clone, or delete.',
+            content:
+                'Unknown action `$action`. Use add, clone, info, or delete.',
           ),
         );
     }

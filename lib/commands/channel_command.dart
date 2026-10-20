@@ -1,8 +1,8 @@
 import 'package:fluxer_dart/fluxer_dart.dart';
 
 /// `!channel create <name>` / `!channel rename <name>` /
-/// `!channel move <position>` / `!channel delete` — guild channel
-/// administration. A single command with an action
+/// `!channel move <position>` / `!channel nest <category_id|none>` /
+/// `!channel delete` — guild channel administration. A single command with an action
 /// sub-argument rather than a subcommand tree: `CommandRouter` has no
 /// concept of nested commands, and building one just for three actions
 /// would be exactly the speculative framework surface this roadmap's own
@@ -11,12 +11,14 @@ import 'package:fluxer_dart/fluxer_dart.dart';
 ///
 /// `move` goes through the guild-wide reorder route even for one channel:
 /// `PATCH /channels/{id}` has no position field. The reorder is answered
-/// by `CHANNEL_UPDATE_BULK`, which the layout logger prints.
+/// by `CHANNEL_UPDATE_BULK`, which the layout logger prints. `nest` moves
+/// the channel into a category, or out of one with `none`, through
+/// [ChannelUpdateBuilder.parent].
 Future<void> handleChannel(CommandContext context) async {
   if (context.args.isEmpty) {
     await context.reply(
       MessageBuilder(
-        content: 'Usage: `!channel create|rename|move|delete ...`',
+        content: 'Usage: `!channel create|rename|move|nest|delete ...`',
       ),
     );
     return;
@@ -100,6 +102,31 @@ Future<void> handleChannel(CommandContext context) async {
         MessageBuilder(content: 'Moved to position ${moved.position}.'),
       );
 
+    case 'nest':
+      final categoryId = rest == 'none' ? null : int.tryParse(rest);
+      if (rest != 'none' && categoryId == null) {
+        await context.reply(
+          MessageBuilder(content: 'Usage: `!channel nest <category_id|none>`'),
+        );
+        return;
+      }
+      final current = await context.bot.channel(channelId);
+      final currentType = current.type;
+      if (currentType == null) return;
+      final moved = await context.bot.channels.update(
+        channelId,
+        ChannelUpdateBuilder(
+          currentType,
+        ).parent(categoryId == null ? null : Snowflake(categoryId)),
+      );
+      await context.reply(
+        MessageBuilder(
+          content: moved.parentId == null
+              ? 'Moved out of its category.'
+              : 'Moved into category ${moved.parentId}.',
+        ),
+      );
+
     case 'delete':
       await context.bot.channels.delete(channelId);
 
@@ -107,7 +134,8 @@ Future<void> handleChannel(CommandContext context) async {
       await context.reply(
         MessageBuilder(
           content:
-              'Unknown action `$action`. Use create, rename, move, or delete.',
+              'Unknown action `$action`. Use create, rename, move, nest, or '
+              'delete.',
         ),
       );
   }
