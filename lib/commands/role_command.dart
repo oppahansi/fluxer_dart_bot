@@ -2,13 +2,22 @@ import 'package:fluxer_dart/fluxer_dart.dart';
 
 import 'guild_context.dart';
 
-/// `!role create`, `!role delete`, `!role add`, and `!role remove`
-/// (a role/user id pair for the last two) — requires `manageRoles`. One
-/// command with an action sub-argument, same reasoning as `!channel`.
+/// `!role list|create|delete|rename|color|hoist|move|add|remove` —
+/// requires `manageRoles`. One command with an action sub-argument, same
+/// reasoning as `!channel`.
+///
+/// `rename`, `color` and `hoist` go through [GuildRoleUpdateBuilder],
+/// which sends only the fields it was given. `move` uses the reorder
+/// route, answered by `GUILD_ROLE_UPDATE_BULK` for every role that
+/// shifted.
 Future<void> handleRole(CommandContext context) async {
   if (context.args.isEmpty) {
     await context.reply(
-      MessageBuilder(content: 'Usage: `!role create|delete|add|remove ...`'),
+      MessageBuilder(
+        content:
+            'Usage: `!role list|create|delete|rename|color|hoist|move|'
+            'add|remove ...`',
+      ),
     );
     return;
   }
@@ -21,6 +30,86 @@ Future<void> handleRole(CommandContext context) async {
 
   try {
     switch (action) {
+      case 'list':
+        final roles = await context.bot.roles.list(guildId)
+          ..sort((a, b) => b.position.compareTo(a.position));
+        await context.reply(
+          MessageBuilder(
+            content: roles
+                .map(
+                  (r) =>
+                      '- ${r.name} `${r.id}` pos ${r.position}'
+                      '${r.hoist ? ', hoisted' : ''}'
+                      '${r.color != 0 ? ', #${r.color.toRadixString(16).padLeft(6, '0')}' : ''}',
+                )
+                .join('\n'),
+          ),
+        );
+
+      case 'rename' || 'color' || 'hoist':
+        final roleId = rest.isEmpty ? null : int.tryParse(rest.first);
+        final value = rest.skip(1).join(' ');
+        final update = switch (action) {
+          'rename' when value.isNotEmpty => GuildRoleUpdateBuilder().name(
+            value,
+          ),
+          'color' => switch (int.tryParse(
+            value.replaceFirst('#', ''),
+            radix: 16,
+          )) {
+            final color? => GuildRoleUpdateBuilder().color(color),
+            null => null,
+          },
+          'hoist' when value == 'on' || value == 'off' =>
+            GuildRoleUpdateBuilder().hoist(value == 'on'),
+          _ => null,
+        };
+        if (roleId == null || update == null) {
+          final hint = switch (action) {
+            'rename' => '<name>',
+            'color' => '<#rrggbb>',
+            _ => 'on|off',
+          };
+          await context.reply(
+            MessageBuilder(content: 'Usage: `!role $action <role_id> $hint`'),
+          );
+          return;
+        }
+        final role = await context.bot.roles.update(
+          guildId,
+          Snowflake(roleId),
+          update,
+        );
+        await context.reply(
+          MessageBuilder(
+            content:
+                'Updated "${role.name}": colour '
+                '#${role.color.toRadixString(16).padLeft(6, '0')}, '
+                '${role.hoist ? 'hoisted' : 'not hoisted'}.',
+          ),
+        );
+
+      case 'move':
+        final roleId = rest.isEmpty ? null : int.tryParse(rest.first);
+        final position = rest.length < 2 ? null : int.tryParse(rest[1]);
+        if (roleId == null || position == null) {
+          await context.reply(
+            MessageBuilder(content: 'Usage: `!role move <role_id> <position>`'),
+          );
+          return;
+        }
+        await context.bot.roles.updatePositions(guildId, {
+          Snowflake(roleId): position,
+        });
+        final moved = (await context.bot.roles.list(
+          guildId,
+        )).firstWhere((r) => r.id == Snowflake(roleId));
+        await context.reply(
+          MessageBuilder(
+            content: 'Moved "${moved.name}" to position ${moved.position}.',
+          ),
+        );
+
       case 'create':
         if (rest.isEmpty) {
           await context.reply(
@@ -90,7 +179,8 @@ Future<void> handleRole(CommandContext context) async {
         await context.reply(
           MessageBuilder(
             content:
-                'Unknown action `$action`. Use create, delete, add, or remove.',
+                'Unknown action `$action`. Use list, create, delete, rename, '
+                'color, hoist, move, add, or remove.',
           ),
         );
     }

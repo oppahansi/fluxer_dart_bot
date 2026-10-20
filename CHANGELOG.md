@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.0
+
+- `!channels`: the guild's channels by category and position.
+- `!channel move <position>`.
+- `!role list|rename|color|hoist|move`, alongside the existing actions.
+- `!nick <name>|reset`: this bot's own nickname.
+- `!memberquery [prefix]`: members and their presences over the
+  gateway, including the full-list rate limit.
+- A layout logger for channel and role reorders and for changes to the
+  bot's own user.
+
 ## 0.4.0
 
 - `!thread start|private|list|rename|archive|lock|members`. `start` used

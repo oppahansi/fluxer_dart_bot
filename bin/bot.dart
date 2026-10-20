@@ -5,6 +5,7 @@ import 'package:fluxer_dart_bot/commands/announce_command.dart';
 import 'package:fluxer_dart_bot/commands/auditlog_command.dart';
 import 'package:fluxer_dart_bot/commands/ban_command.dart';
 import 'package:fluxer_dart_bot/commands/channel_command.dart';
+import 'package:fluxer_dart_bot/commands/channels_command.dart';
 import 'package:fluxer_dart_bot/commands/embed_command.dart';
 import 'package:fluxer_dart_bot/commands/emoji_command.dart';
 import 'package:fluxer_dart_bot/commands/forum_command.dart';
@@ -13,9 +14,12 @@ import 'package:fluxer_dart_bot/commands/help_command.dart';
 import 'package:fluxer_dart_bot/commands/instance_command.dart';
 import 'package:fluxer_dart_bot/commands/invite_command.dart';
 import 'package:fluxer_dart_bot/commands/kick_command.dart';
+import 'package:fluxer_dart_bot/commands/layout_logger.dart';
 import 'package:fluxer_dart_bot/commands/members_command.dart';
+import 'package:fluxer_dart_bot/commands/memberquery_command.dart';
 import 'package:fluxer_dart_bot/commands/membersearch_command.dart';
 import 'package:fluxer_dart_bot/commands/moderation_logger.dart';
+import 'package:fluxer_dart_bot/commands/nick_command.dart';
 import 'package:fluxer_dart_bot/commands/permission_command.dart';
 import 'package:fluxer_dart_bot/commands/pin_command.dart';
 import 'package:fluxer_dart_bot/commands/ping_command.dart';
@@ -86,6 +90,7 @@ Future<void> main() async {
     );
     registerModerationLoggers(bot, logger);
     registerThreadLoggers(bot, logger);
+    registerLayoutLoggers(bot, logger);
 
     final commands = CommandRouter(bot: bot, prefix: '!')
       ..command(
@@ -216,6 +221,13 @@ Future<void> main() async {
       )
       ..command('serverinfo', handleServerInfo)
       ..command('members', handleMembers)
+      ..command('channels', handleChannels)
+      ..command('memberquery', handleMemberQuery)
+      ..command(
+        'nick',
+        handleNick,
+        middleware: [requireGuildPermission(PermissionFlag.manageNicknames)],
+      )
       ..command('setup', handleSetup);
     commands.command('help', helpCommand(commands));
 

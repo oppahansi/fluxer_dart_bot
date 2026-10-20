@@ -89,13 +89,14 @@ nothing below is needed just to bring the bot online.
 | `!reply` | `MessageBuilder.replyTo()` — a real reply reference, not just same-channel | — |
 | `!react` | `MessageRestManager.addReaction()` | — |
 | `!purge <1-100>` | Listing + `bulkDelete()` | `manageMessages` |
-| `!channel create\|rename\|delete` | Channel CRUD, `ChannelCreateBuilder`/`ChannelUpdateBuilder` | `manageChannels` |
+| `!channel create\|rename\|move\|delete` | Channel CRUD, `ChannelCreateBuilder`/`ChannelUpdateBuilder`, and `move` through the guild-wide reorder route | `manageChannels` |
+| `!channels` | `GuildRestManager.listChannels()`, laid out by category and position with `Channel.parentId`/`Channel.position` | — |
 | `!slowmode <seconds>` | Per-channel rate limiting | `manageChannels` |
 | `!permission set\|clear <role_id> <flag>` | Role-scoped channel permission overwrites | `manageRoles` |
 | `!kick` | Member removal | `kickMembers` |
 | `!ban [reason]` / `!unban` | Ban management | `banMembers` |
 | `!timeout <minutes> [reason]` | Member timeout (`0` clears it) | `moderateMembers` |
-| `!role create\|delete\|add\|remove` | Guild role CRUD + member role assignment | `manageRoles` |
+| `!role list\|create\|delete\|rename\|color\|hoist\|move\|add\|remove` | Guild role CRUD, `GuildRoleUpdateBuilder`, reordering, and member role assignment | `manageRoles` |
 | `!auditlog [count]` | `GuildRestManager.getAuditLogs()` | `viewAuditLog` |
 | `!emoji add\|clone\|delete` | Custom emoji management, data-URI image upload | `createExpressions` |
 | `!sticker add\|clone\|delete` | Custom sticker management | `createExpressions` |
@@ -114,6 +115,8 @@ nothing below is needed just to bring the bot online.
 | `!presence <status> [text]` | A gateway command rather than a REST call — no response, and rate limited | — |
 | `!userinfo [user id]` | `Bot.fetchUser()`, cache-first with a REST fallback | — |
 | `!membersearch <query>` | The search index rather than the member list, so it scales past paging every member | — |
+| `!memberquery [prefix]` | `Bot.queryMembers()`: members with presences over the gateway, and the 30-second budget on the full list | — |
+| `!nick <name>\|reset` | The bot's own guild profile through the `@me` member routes, `CurrentMemberUpdateBuilder` | `manageNicknames` |
 | `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
 | `!announce create\|stats` | Announcement channels — a channel of type `GUILD_ANNOUNCEMENT`, plus how widely it is followed | `manageChannels` |
 | `!follow <channel id>` | Subscribing this channel to an announcement channel. Creates a channel follower webhook, which is what delivers the copies | `manageWebhooks` |
