@@ -102,7 +102,7 @@ nothing below is needed just to bring the bot online.
 | `!sticker add\|clone\|info\|rename\|delete` | Custom sticker management, metadata, renaming and retagging | `createExpressions` |
 | `!webhook create <name>` / `!webhook relay <text>` / `!webhook delete <id>` | Webhook creation **and** the separate token-based execute path (`WebhookExecuteClient`, no bot auth at all) | `manageWebhooks` |
 | `!invite create\|list` / `!invite delete <code>` | Channel invite management | `createInstantInvite` |
-| `!serverinfo` | Guild stats fetched fresh via REST (deliberately bypasses the gateway cache — see the doc comment on `handleServerInfo`) | — |
+| `!serverinfo` | Guild stats fetched fresh via REST (deliberately bypasses the gateway cache — see the doc comment on `handleServerInfo`), with the guild's custom badges resolved through `InstanceDiscovery.resolveGuildBadges` | — |
 | `!members` | Reaction-based pagination over the full member list | — |
 | `!help` | Reaction-based pagination over `CommandRouter.commandNames` | — |
 | `!setup` | Owner-only, DM-based multi-turn setup flow (`UserRestManager.createDm()`) | — (owner-only check, not a permission flag) |
@@ -125,10 +125,10 @@ nothing below is needed just to bring the bot online.
 | `!search <text>` | `MessageSearchBuilder` over the guild's messages, and the not-yet-indexed answer | — |
 | `!discovery categories\|browse\|status\|apply\|withdraw` | `Bot.discovery`: browsing listed guilds and this guild's application | `manageGuild` |
 | `!appinfo` | `UserRestManager.application()` — the bot's own OAuth2 application | — |
-| `!profile [user_id]` | `UserRestManager.profile()` with the guild profile and mutual guilds | — |
+| `!profile [user_id]` | `UserRestManager.profile()` with the guild profile, mutual guilds and `UserProfile.badges` | — |
 | `!vanity [code\|clear]` | Vanity invite codes, and how `FluxerApiException.fieldErrors` explains a rejection | `manageGuild` |
 | `!forgetme` | `deleteAllOwnMessagesInGuild()` behind a typed confirmation, since the API asks a bot for none | guild owner |
-| `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment | — |
+| `!instance` | Reading `/.well-known/fluxer`, which is how a bot targets any self-hosted deployment; also lists the deployment's guild badges and its administrator notice | — |
 | `!announce create\|stats` | Announcement channels — a channel of type `GUILD_ANNOUNCEMENT`, plus how widely it is followed | `manageChannels` |
 | `!follow <channel id>` | Subscribing this channel to an announcement channel. Creates a channel follower webhook, which is what delivers the copies | `manageWebhooks` |
 | `!publish` | Crossposting the replied-to message to every following channel | — (the API enforces `manageMessages` for others' messages) |

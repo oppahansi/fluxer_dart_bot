@@ -23,12 +23,16 @@ Future<void> handleProfile(CommandContext context) async {
     );
     final bio = profile.guildBio ?? profile.bio;
     final pronouns = profile.guildPronouns ?? profile.pronouns;
+    final badges = profile.badges.isEmpty
+        ? 'No badges.'
+        : 'Badges: ${profile.badges.map((b) => b.caption ?? b.label).join(', ')}.';
     await context.reply(
       MessageBuilder(
         content:
             '**${profile.user.displayName}** `${profile.user.id}`'
             '${pronouns == null ? '' : ' ($pronouns)'}\n'
             '${bio ?? 'No bio.'}\n'
+            '$badges\n'
             '${profile.guildMember == null ? 'Not a member here.' : 'Member since ${profile.guildMember!.joinedAt.toIso8601String().substring(0, 10)}.'} '
             'Shares ${profile.mutualGuilds.length} guild(s) with this bot.',
       ).allowedMentions(AllowedMentions.none),

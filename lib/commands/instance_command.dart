@@ -8,13 +8,7 @@ import 'package:fluxer_dart/fluxer_dart.dart';
 /// `endpoints.api_public` and connect the gateway to `endpoints.gateway`
 /// instead of hardcoding either.
 Future<void> handleInstance(CommandContext context) async {
-  final origin = context.bot.rest.transport is PackageHttpTransport
-      ? (context.bot.rest.transport as PackageHttpTransport).baseUrl
-      : Uri.parse('https://fluxer.app');
-
-  final discovery = await const InstanceRestManager().discover(
-    origin.replace(path: ''),
-  );
+  final discovery = await discoverInstance(context.bot);
 
   final enabled = discovery.features.entries
       .where((e) => e.value == true)
@@ -22,16 +16,30 @@ Future<void> handleInstance(CommandContext context) async {
       .take(8)
       .join(', ');
 
-  await context.reply(
-    MessageBuilder().embed(
-      EmbedBuilder()
-          .title('Instance')
-          .field('API version', '${discovery.apiCodeVersion}')
-          .field('Public API', '${discovery.endpoints.apiPublic}')
-          .field('Gateway', '${discovery.endpoints.gateway}')
-          .field('Media', '${discovery.endpoints.media}')
-          .field('Features', enabled.isEmpty ? 'none reported' : enabled)
-          .build(),
-    ),
-  );
+  final notice = discovery.notice;
+  final embed = EmbedBuilder()
+      .title('Instance')
+      .field('API version', '${discovery.apiCodeVersion}')
+      .field('Public API', '${discovery.endpoints.apiPublic}')
+      .field('Gateway', '${discovery.endpoints.gateway}')
+      .field('Media', '${discovery.endpoints.media}')
+      .field('Features', enabled.isEmpty ? 'none reported' : enabled)
+      .field(
+        'Guild badges',
+        discovery.guildBadges.isEmpty
+            ? 'none'
+            : discovery.guildBadges.map((b) => b.name).join(', '),
+      );
+  if (notice != null) embed.field('Notice', notice.message);
+
+  await context.reply(MessageBuilder().embed(embed.build()));
+}
+
+/// Fetches the discovery document of the deployment [bot] talks to.
+Future<InstanceDiscovery> discoverInstance(Bot bot) {
+  final transport = bot.rest.transport;
+  final origin = transport is PackageHttpTransport
+      ? transport.baseUrl
+      : Uri.parse('https://fluxer.app');
+  return const InstanceRestManager().discover(origin.replace(path: ''));
 }

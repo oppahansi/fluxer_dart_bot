@@ -1,6 +1,7 @@
 import 'package:fluxer_dart/fluxer_dart.dart';
 
 import 'guild_context.dart';
+import 'instance_command.dart';
 
 /// `!serverinfo` — basic guild stats plus vanity URL, if the guild has
 /// one. No permission gate: this is the same information any member can
@@ -21,6 +22,12 @@ Future<void> handleServerInfo(CommandContext context) async {
       ? 'none'
       : 'fluxer.app/i/${guild.vanityUrlCode}';
 
+  final badges = guild.badgeIds.isEmpty
+      ? const <InstanceGuildBadge>[]
+      : (await discoverInstance(
+          context.bot,
+        )).resolveGuildBadges(guild.badgeIds);
+
   await context.reply(
     MessageBuilder(
       content:
@@ -28,7 +35,8 @@ Future<void> handleServerInfo(CommandContext context) async {
           'Members: ${guild.memberCount ?? 'unknown'} '
           '(${guild.onlineCount ?? 'unknown'} online)\n'
           'Owner: <@${guild.ownerId}>\n'
-          'Vanity invite: $vanity',
+          'Vanity invite: $vanity\n'
+          'Badges: ${badges.isEmpty ? 'none' : badges.map((b) => b.name).join(', ')}',
     ),
   );
 }

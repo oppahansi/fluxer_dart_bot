@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- `!profile` lists the user's badges, `!serverinfo` the guild's custom
+  badges, and `!instance` the deployment's guild badges and its notice.
+
 ## 0.5.0
 
 - `!channels`: the guild's channels by category and position.
