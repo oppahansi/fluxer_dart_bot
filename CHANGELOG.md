@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.6.0
 
 - `!profile` lists the user's badges, `!serverinfo` the guild's custom
   badges, and `!instance` the deployment's guild badges and its notice.
+- Pins `fluxer_dart` 0.6.0.
 
 ## 0.5.0
 
