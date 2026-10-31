@@ -1,5 +1,7 @@
 # fluxer_dart_bot
 
+[![Discord](https://img.shields.io/static/v1?logo=discord&label=discord&message=Join&color=blue)](https://discord.gg/ncKmDEArqg)
+
 An example bot for [fluxer_dart](https://github.com/oppahansi/fluxer_dart) —
 deliberately modest in structure (`bin/bot.dart` + one file per command
 under `lib/commands/`), but it now walks through effectively everything a
